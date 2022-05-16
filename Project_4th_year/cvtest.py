@@ -36,6 +36,8 @@ class video():
 		global text_norm
 		global fulltext
 		global fulltext_norm
+
+		print("start video")
 		# define a video capture object
 		vid = cv2.VideoCapture(0)
 		# define pytesseract
