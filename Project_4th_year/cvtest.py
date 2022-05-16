@@ -40,7 +40,7 @@ class video():
 
 		print("start video")
 		# define a video capture object
-		vid = cv2.VideoCapture(0)
+		vid = cv2.VideoCapture(2)
 		# define pytesseract
 			
 			# Capture the video frame
