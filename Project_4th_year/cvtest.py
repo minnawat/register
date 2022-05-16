@@ -58,7 +58,7 @@ class video():
 			print("got testimage0.jpg")
 		#code start here
 		#all varibles
-		img = cv2.imread('testimage1.jpg')
+		img = cv2.imread('testimage0.jpg')
 		print("start to read image")
 		gray = get_grayscale(img)
 		print("got grayscale")
