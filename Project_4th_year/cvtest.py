@@ -1,4 +1,5 @@
 # import the opencv library
+from traceback import print_tb
 import cv2
 import pytesseract
 import requests
@@ -53,14 +54,19 @@ class video():
 			# quitting button you may use any
 			# desired button of your choice
 			cv2.imwrite('testimage0.jpg',frame)
+			print("got testimage0.jpg")
 		#code start here
 		#all varibles
 		img = cv2.imread('testimage1.jpg')
+		print("start to read image")
 		gray = get_grayscale(img)
+		print("got grayscale")
 		thresh = thresholding(gray)
+		print("got threshold")
 		text = pytesseract.image_to_string(thresh)
+		print("tesseract 1")
 		text_norm = pytesseract.image_to_string(img)
-		print("image readed")
+		print("tesseract 2")
 		text = text.splitlines()
 		text_norm = text_norm.splitlines()
 		#img_tha = img_tha.splitlines()
