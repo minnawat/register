@@ -8,24 +8,14 @@ from fuzzysearch import find_near_matches
 
 
 
-##text = pytesseract.image_to_string('testimage0.jpg')
+
 #all varibles
-img = cv2.imread('testimage2.jpg')
+img = cv2.imread('testimage0.jpg')
 gray = get_grayscale(img)
-o = opening(gray)
-c = canny(gray)
-d = dilate(gray)
-e = erode(gray)
 thresh = thresholding(gray)
-mthresh = meanthresholding(gray)
-adthresh = adaptivethresholding(gray)
-re_noise = remove_noise(thresh)
-#img_tha = pytesseract.image_to_string('testimage1.jpg', 'tha')
-#img = cv2.cvtColor(img , cv2.COLOR_BGR2HSV)
 title = ["Mr." , "Mrs." , "Miss"]
 month = ["Jan." , "Feb." , "Mar." , "Apr." , "May" , "Jun." , "Jul." , "Aug." , "Sep." , "Oct." , "Nov." , "Dec."]
 month_num = ["01" , "02" , "03" , "04" , "05" , "06" , "07" , "08" , "09" , "10" , "11" ,"12"]
-
 text = pytesseract.image_to_string(thresh)
 text_norm = pytesseract.image_to_string(img)
 uname = ''
@@ -62,7 +52,12 @@ class video():
 			# desired button of your choice
 			cv2.imwrite('testimage0.jpg',frame)
 		#code start here
-		#print(text)
+		#all varibles
+		img = cv2.imread('testimage0.jpg')
+		gray = get_grayscale(img)
+		thresh = thresholding(gray)
+		text = pytesseract.image_to_string(thresh)
+		text_norm = pytesseract.image_to_string(img)
 		print("image readed")
 		text = text.splitlines()
 		text_norm = text_norm.splitlines()
@@ -427,7 +422,9 @@ class search_send:
 		search.find_id()
 
 		payload = {"name" : uname , "id" : uid , "date" : udate}
-
+		print(uname)
+		print(uid)
+		print(udate)
 		r = requests.get('https://smartregis00.herokuapp.com/receive', params=payload)
 		if r:
 			print("send successful")
@@ -435,6 +432,7 @@ class search_send:
 		else:
 			print("something went wrong check response code")
 			print(r)
+
 
 
 #print(text)

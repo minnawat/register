@@ -1,6 +1,5 @@
-from email.mime import image
+
 import cv2
-import pytesseract
 import numpy as np
 
 
