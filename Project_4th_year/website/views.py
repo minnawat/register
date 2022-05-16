@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template,Response
-from cvtest import video,finder,search_send
-import socket
+from cvtest import video,search_send
 
 views = Blueprint('views', __name__)
 

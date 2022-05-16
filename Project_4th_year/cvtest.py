@@ -10,7 +10,7 @@ from fuzzysearch import find_near_matches
 
 
 #all varibles
-img = cv2.imread('testimage0.jpg')
+img = cv2.imread('testimage1.jpg')
 gray = get_grayscale(img)
 thresh = thresholding(gray)
 title = ["Mr." , "Mrs." , "Miss"]
@@ -53,7 +53,7 @@ class video():
 			cv2.imwrite('testimage0.jpg',frame)
 		#code start here
 		#all varibles
-		img = cv2.imread('testimage0.jpg')
+		img = cv2.imread('testimage1.jpg')
 		gray = get_grayscale(img)
 		thresh = thresholding(gray)
 		text = pytesseract.image_to_string(thresh)
