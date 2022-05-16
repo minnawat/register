@@ -40,12 +40,13 @@ class video():
 
 		print("start video")
 		# define a video capture object
-		vid = cv2.VideoCapture(2)
+		vid = cv2.VideoCapture(0)
 		# define pytesseract
-			
+		print("camera define")
 			# Capture the video frame
 			# by frame
 		ret, frame = vid.read()
+		print("get ret and frame")
 		if ret == True:
 			# Display the resulting frame
 			cv2.imshow('frame', frame)
