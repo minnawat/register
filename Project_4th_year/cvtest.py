@@ -82,6 +82,7 @@ class video():
 		print(text)
 		print(text_norm)
 		print("word splited")
+		cv2.destroyAllWindows()
 
 
 
