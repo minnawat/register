@@ -42,6 +42,8 @@ class video():
 		# define a video capture object
 		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
 		vid = cv2.VideoCapture(0)
+		focus = 125  # min: 0, max: 255, increment:5
+		vid.set(28, focus) 
 		# define pytesseract
 		print("camera define")
 			# Capture the video frame
