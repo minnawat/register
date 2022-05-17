@@ -452,6 +452,9 @@ class finder:
 class search_send:
 	def run(self):
 		global payload
+		global uname
+		global uid
+		global udate
 		
 		search = finder()
 		if search.find_name() == 'void':
