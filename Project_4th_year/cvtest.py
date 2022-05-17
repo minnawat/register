@@ -11,7 +11,7 @@ from fuzzysearch import find_near_matches
 
 
 #all varibles
-img = cv2.imread('testimage1.jpg')
+img = cv2.imread('testimage0.jpg')
 gray = get_grayscale(img)
 thresh = thresholding(gray)
 title = ["Mr." , "Mrs." , "Miss"]
@@ -60,6 +60,8 @@ class video():
 		#code start here
 		#all varibles
 		img = cv2.imread('testimage0.jpg')
+		cv2.imshow('',img)
+		cv2.waitKey(0)
 		print("start to read image")
 		gray = get_grayscale(img)
 		print("got grayscale")
@@ -443,8 +445,8 @@ class search_send:
 			print("something went wrong check response code")
 			print(r)
 
-
-
+vid = video()
+vid.run()
 #print(text)
 #cv2.imshow('',gray)
 #cv2.waitKey(0)
