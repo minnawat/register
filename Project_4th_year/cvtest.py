@@ -41,9 +41,9 @@ class video():
 		print("start video")
 		# define a video capture object
 		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
-		vid = cv2.VideoCapture(0)
-		focus = 125  # min: 0, max: 255, increment:5
-		vid.set(28, focus) 
+		vid = cv2.VideoCapture(1)
+		vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+		vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 		# define pytesseract
 		print("camera define")
 			# Capture the video frame
@@ -211,7 +211,8 @@ class finder:
 		global uname
 		global text
 		global fulltext
-
+		
+		new_text = []
 		lastname = ''
 		for x in title :
 			matches = [match for match in text if x in match]
@@ -242,7 +243,6 @@ class finder:
 							w_word = w_word.replace('\'',"")
 							w_word = w_word.replace('\"',"")
 							#print(w_word)
-							new_text = []
 							for y in text:
 								new_udate = y.replace(w_word,x)
 								new_text.append(new_udate)
