@@ -115,6 +115,8 @@ class finder:
 		global uname
 		global text_norm
 		global fulltext_norm
+
+		new_text = []
 		lastname = ''
 		for x in title :
 			matches = [match for match in text_norm if x in match]
@@ -144,7 +146,6 @@ class finder:
 							w_word = w_word.replace('\'',"")
 							w_word = w_word.replace('\"',"")
 							#print(w_word)
-							new_text = []
 							for y in text_norm:
 								new_udate = y.replace(w_word,x)
 								new_text.append(new_udate)
