@@ -176,16 +176,17 @@ class finder:
 			lastname = lastname[location : len(lastname)]
 			if lastname.find(" "):
 				lastname == 'void'
-		matches = [match for match in text_norm if "Last name" in match]
-		if matches:
-			lastname = lastname.join(matches)
-			location = lastname.find("Last name")
-			if(location != -1):
-				location = location + 10
-				#name_local = text.find("Lastname",location)
-			lastname = lastname[location : len(lastname)]
-			if lastname.find(" "):
-				lastname == 'void'
+		elif not matches:
+			matches = [match for match in text_norm if "Last name" in match]
+			if matches:
+				lastname = lastname.join(matches)
+				location = lastname.find("Last name")
+				if(location != -1):
+					location = location + 10
+					#name_local = text.find("Lastname",location)
+				lastname = lastname[location : len(lastname)]
+				if lastname.find(" "):
+					lastname == 'void'
 		elif(find_near_matches('last name',fulltext_norm, max_l_dist=1)):
 			data = ''.join(str(find_near_matches('last name',fulltext_norm, max_l_dist=1)))
 			location = data.find("matched=")
@@ -280,16 +281,17 @@ class finder:
 			if(location != -1):
 				location = location + 9
 			lastname = lastname[location : len(lastname)]
-		matches = [match for match in text_norm if "Last name" in match]
-		if matches:
-			lastname = lastname.join(matches)
-			location = lastname.find("Last name")
-			if(location != -1):
-				location = location + 10
-				#name_local = text.find("Lastname",location)
-			lastname = lastname[location : len(lastname)]
-			if lastname.find(" "):
-				lastname == 'void'
+		elif not matches:
+			matches = [match for match in text_norm if "Last name" in match]
+			if matches:
+				lastname = lastname.join(matches)
+				location = lastname.find("Last name")
+				if(location != -1):
+					location = location + 10
+					#name_local = text.find("Lastname",location)
+				lastname = lastname[location : len(lastname)]
+				if lastname.find(" "):
+					lastname == 'void'
 		elif(find_near_matches('last name',fulltext, max_l_dist=1)):
 			data = ''.join(str(find_near_matches('last name',fulltext_norm, max_l_dist=1)))
 			location = data.find("matched=")
