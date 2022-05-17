@@ -41,12 +41,31 @@ class video():
 		print("start video")
 		# define a video capture object
 		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
-		vid = cv2.VideoCapture(1)
+		vid = cv2.VideoCapture(0)
 		# define pytesseract
 		print("camera define")
 			# Capture the video frame
 			# by frame
-		ret, frame = vid.read()
+		while(True):
+      
+			# Capture the video frame
+			# by frame
+			ret, frame = vid.read()
+		
+			# Display the resulting frame
+			cv2.imshow('frame', frame)
+			
+			# the 'q' button is set as the
+			# quitting button you may use any
+			# desired button of your choice
+			if cv2.waitKey(1) & 0xFF == ord('q'):
+				cv2.imwrite('testimage0.jpg',frame)
+				break
+		# After the loop release the cap object
+		vid.release()
+		# Destroy all the windows
+		cv2.destroyAllWindows()
+		'''ret, frame = vid.read()
 		print("get ret and frame")
 		if ret == True:
 			# Display the resulting frame
@@ -59,11 +78,12 @@ class video():
 			print("got testimage0.jpg")
 		else:
 			print("error at camera not reading")
+		vid.release()
+		cv2.destroyAllWindows()
 		#code start here
 		#all varibles
+		'''
 		img = cv2.imread('testimage0.jpg')
-		cv2.imshow('',img)
-		cv2.waitKey(0)
 		print("start to read image")
 		gray = get_grayscale(img)
 		print("got grayscale")
@@ -82,7 +102,6 @@ class video():
 		print(text)
 		print(text_norm)
 		print("word splited")
-		cv2.destroyAllWindows()
 
 
 
