@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template,Response
 from cvtest import video,search_send
-import cv2
 
 views = Blueprint('views', __name__)
 

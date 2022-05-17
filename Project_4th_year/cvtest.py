@@ -40,8 +40,8 @@ class video():
 
 		print("start video")
 		# define a video capture object
-		vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
-		#vid = cv2.VideoCapture("/dev/video1")
+		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
+		vid = cv2.VideoCapture(1)
 		# define pytesseract
 		print("camera define")
 			# Capture the video frame
@@ -57,6 +57,8 @@ class video():
 			# desired button of your choice
 			cv2.imwrite('testimage0.jpg',frame)
 			print("got testimage0.jpg")
+		else:
+			print("error at camera not reading")
 		#code start here
 		#all varibles
 		img = cv2.imread('testimage0.jpg')
@@ -445,8 +447,6 @@ class search_send:
 			print("something went wrong check response code")
 			print(r)
 
-vid = video()
-vid.run()
 #print(text)
 #cv2.imshow('',gray)
 #cv2.waitKey(0)
