@@ -423,6 +423,8 @@ class finder:
 		global uid
 		global fulltext
 		global fulltext_norm
+
+
 		if(uname_norm_found == True and udate_norm_found == True):
 			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext_norm)
 			uid = uid.join(id)
@@ -439,7 +441,11 @@ class finder:
 			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext_norm)
 			uid = uid.join(id)
 			uid = uid.replace(" ","")
-		elif uid == '' :
+		else :
+			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext)
+			uid = uid.join(id)
+			uid = uid.replace(" ","")
+		if uid == '' :
 			uid = 'void'
 		return uid
 
@@ -457,7 +463,12 @@ class search_send:
 		else: 
 			search.find_date()
 		search.find_id()
-
+		if not uname:
+			uname = 'void'
+		if not uid:
+			uid = 'void'
+		if not udate:
+			udate = 'void' 
 		payload = {"name" : uname , "id" : uid , "date" : udate}
 		print(uname)
 		print(uid)
