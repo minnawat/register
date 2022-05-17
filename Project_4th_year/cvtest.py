@@ -176,18 +176,18 @@ class finder:
 			lastname = lastname[location : len(lastname)]
 			if lastname.find(" "):
 				lastname == 'void'
-		elif(find_near_matches('lastname',fulltext_norm, max_l_dist=2)):
-			data = ''.join(str(find_near_matches('lastname',fulltext_norm, max_l_dist=2)))
+		elif(find_near_matches('last name',fulltext_norm, max_l_dist=1)):
+			data = ''.join(str(find_near_matches('last name',fulltext_norm, max_l_dist=1)))
 			location = data.find("matched=")
 			if (location != -1):
-				location = location + 8
+				location = location + 9
 				end_local = data.find(")",location)
 				w_word = data[location : end_local]
 				w_word = w_word.replace('\'',"")
 				w_word = w_word.replace('\"',"")
 			new_text = []
 			for x in text:
-				new_udate = x.replace(w_word,"lastname")
+				new_udate = x.replace(w_word,"last name")
 				new_text.append(new_udate)
 			matches = [match for match in new_text if "Lastname" in match]
 			if matches:
@@ -270,11 +270,11 @@ class finder:
 			if(location != -1):
 				location = location + 9
 			lastname = lastname[location : len(lastname)]
-		elif(find_near_matches('lastname',fulltext, max_l_dist=2)):
-			data = ''.join(str(find_near_matches('lastname',fulltext_norm, max_l_dist=2)))
+		elif(find_near_matches('last name',fulltext, max_l_dist=1)):
+			data = ''.join(str(find_near_matches('last name',fulltext_norm, max_l_dist=1)))
 			location = data.find("matched=")
 			if (location != -1):
-				location = location + 8
+				location = location + 9
 				end_local = data.find(")",location)
 				w_word = data[location : end_local]
 				w_word = w_word.replace('\'',"")
