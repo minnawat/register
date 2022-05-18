@@ -40,7 +40,7 @@ class video():
 		print("start video")
 		# define a video capture object
 		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
-		vid = cv2.VideoCapture(1)
+		vid = cv2.VideoCapture(0)
 		vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 		vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 		# define pytesseract
@@ -84,7 +84,7 @@ class video():
 		#code start here
 		#all varibles
 		'''
-		img = cv2.imread('testimage0.jpg')
+		img = cv2.imread('testimage1.jpg')
 		print("start to read image")
 		gray = get_grayscale(img)
 		print("got grayscale")
@@ -327,6 +327,7 @@ class finder:
 		global udate
 		global text_norm
 		global fulltext_norm
+
 		matches = [match for match in text_norm if "Date of Birth" in match]
 		if matches:
 			udate = udate.join(matches)
@@ -384,7 +385,13 @@ class finder:
 		global udate
 		global text
 		global fulltext
-
+		'''
+		for x in month:
+			matches = [match for match in text if "\d{2} " + x + " \d{4}" in match]
+			if matches:
+				udate = udate.join(matches)
+				return udate
+		'''
 		matches = [match for match in text if "Date of Birth" in match]
 		if matches:
 			udate = udate.join(matches)
@@ -488,13 +495,13 @@ class search_send:
 			print(search.find_date_norm())
 		else: 
 			print(search.find_date())
-		search.find_id()
+		print(search.find_id())
 		if not uname:
 			uname = 'void'
 		if not uid:
 			uid = 'void'
 		if not udate:
-			udate = 'void' 
+			udate = '0000-00-00' 
 		payload = {"name" : uname , "id" : uid , "date" : udate}
 		print(uname)
 		print(uid)
@@ -511,7 +518,10 @@ class search_send:
 #cv2.imshow('',gray)
 #cv2.waitKey(0)
 ##print(text)
-
+vide = video()
+vide.run()
+cap = search_send()
+cap.run()
 # After the loop release the cap object
 #vid.release()
 # Destroy all the windows
