@@ -40,7 +40,7 @@ class video():
 		print("start video")
 		# define a video capture object
 		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
-		vid = cv2.VideoCapture(0)
+		vid = cv2.VideoCapture(1)
 		vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 		vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 		# define pytesseract
@@ -518,10 +518,10 @@ class search_send:
 #cv2.imshow('',gray)
 #cv2.waitKey(0)
 ##print(text)
-vide = video()
-vide.run()
-cap = search_send()
-cap.run()
+#vide = video()
+#vide.run()
+#cap = search_send()
+#cap.run()
 # After the loop release the cap object
 #vid.release()
 # Destroy all the windows
