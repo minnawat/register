@@ -1,5 +1,4 @@
 # import the opencv library
-from traceback import print_tb
 import cv2
 import pytesseract
 import requests
@@ -53,16 +52,16 @@ class video():
 			# Capture the video frame
 			# by frame
 			ret, frame = vid.read()
-		
-			# Display the resulting frame
-			cv2.imshow('frame', frame)
-			
-			# the 'q' button is set as the
-			# quitting button you may use any
-			# desired button of your choice
-			if cv2.waitKey(1) & 0xFF == ord('q'):
-				cv2.imwrite('testimage0.jpg',frame)
-				break
+			if ret == True:
+				# Display the resulting frame
+				cv2.imshow('frame', frame)
+				
+				# the 'q' button is set as the
+				# quitting button you may use any
+				# desired button of your choice
+				if cv2.waitKey(1) & 0xFF == ord('q'):
+					cv2.imwrite('testimage0.jpg',frame)
+					break
 		# After the loop release the cap object
 		vid.release()
 		# Destroy all the windows
@@ -117,6 +116,7 @@ class finder:
 		global fulltext_norm
 
 		new_text = []
+		uname = ''
 		lastname = ''
 		for x in title :
 			matches = [match for match in text_norm if x in match]
@@ -225,6 +225,7 @@ class finder:
 		global fulltext
 		
 		new_text = []
+		uname = ''
 		lastname = ''
 		for x in title :
 			matches = [match for match in text if x in match]
@@ -480,13 +481,13 @@ class search_send:
 		
 		search = finder()
 		if search.find_name() == 'void':
-			search.find_name_norm()
+			print(search.find_name_norm())
 		else: 
-			search.find_name()
+			print(search.find_name())
 		if search.find_date() == 'void':
-			search.find_date_norm()
+			print(search.find_date_norm())
 		else: 
-			search.find_date()
+			print(search.find_date())
 		search.find_id()
 		if not uname:
 			uname = 'void'
