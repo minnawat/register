@@ -31,7 +31,7 @@ udate_thresh_found = False
 udate_norm_found = False
 payload = {'name': uname, 'id': uid , 'date': udate}
 save_frame = NOTHING
-event = threading.Event()
+
 
 
 
@@ -40,15 +40,30 @@ class Video(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self.running = False
+		self.reading = False
 		self.vid = VideoCapture(0)
+		self.img = cv2.imread('testimage0.jpg')
+		self.gray = get_grayscale(img)
+		self.thresh = thresholding(gray)
+		self.title = ["Mr." , "Mrs." , "Miss"]
+		self.month = ["Jan." , "Feb." , "Mar." , "Apr." , "May" , "Jun." , "Jul." , "Aug." , "Sep." , "Oct." , "Nov." , "Dec."]
+		self.month_num = ["01" , "02" , "03" , "04" , "05" , "06" , "07" , "08" , "09" , "10" , "11" ,"12"]
+		self.text = pytesseract.image_to_string(thresh)
+		self.text_norm = pytesseract.image_to_string(img)
+		self.uname = ''
+		self.uid = ''
+		self.udate = ''
+		self.fulltext = NOTHING
+		self.fulltext_norm = NOTHING
+		self.uname_thresh_found = False
+		self.uname_norm_found = False
+		self.udate_thresh_found = False
+		self.udate_norm_found = False
+		self.payload = {'name': self.uname, 'id': self.uid , 'date': self.udate}
+		self.save_frame = NOTHING
 
 	def run(self):
 		self.running = True
-		global text
-		global text_norm
-		global fulltext
-		global fulltext_norm
-		global save_frame
 
 		print("start video")
 		# define a video capture object
@@ -63,16 +78,19 @@ class Video(threading.Thread):
       
 			# Capture the video frame
 			# by frame
-			ret, frame = self.vid.read()
-			if ret == True:
+			self.ret, self.frame = self.vid.read()
+			if self.ret == True:
 				# Display the resulting frame
 				#cv2.imshow('frame', frame)
 				
 				# the 'q' button is set as the
 				# quitting button you may use any
 				# desired button of your choice
-				save_frame = frame
+				self.save_frame = self.frame
 				time.sleep(0.1)
+			if self.reading == True:
+				self.search_send()
+				self.reading = False
 	
 	def close(self):
 		self.running = False
@@ -80,20 +98,20 @@ class Video(threading.Thread):
 		self.vid.release()
 		# Destroy all the windows
 		cv2.destroyAllWindows()
+	
+	def read(self):
+		print("start function read")
+		self.reading = True
 
 	def find_name_norm(self):
-		global uname_norm_found
-		global uname
-		global text_norm
-		global fulltext_norm
 
 		new_text = []
-		uname = ''
+		self.uname = ''
 		lastname = ''
 		for x in title :
-			matches = [match for match in text_norm if x in match]
+			matches = [match for match in self.text_norm if x in match]
 			if matches:
-				uname = uname.join(matches)
+				self.uname = self.uname.join(matches)
 				for x in title :
 				#print(x)
 					location = uname.find(x)
@@ -101,15 +119,15 @@ class Video(threading.Thread):
 						location = location + len(x) + 1
 						#name_local = text.find("Lastname",location)
 						break
-				uname = uname[location : len(uname)]
-				uname.strip()
-				if uname.find(' ') > 0:
-					uname = 'void'
+				self.uname = self.uname[location : len(self.uname)]
+				self.uname.strip()
+				if self.uname.find(' ') > 0:
+					self.uname = 'void'
 					break
 			else:
 				for x in title :
-					if find_near_matches(x,fulltext_norm, max_l_dist=1) :
-						data = ''.join(str(find_near_matches(x,fulltext_norm, max_l_dist=1)))
+					if find_near_matches(x,self.fulltext_norm, max_l_dist=1) :
+						data = ''.join(str(find_near_matches(x,self.fulltext_norm, max_l_dist=1)))
 						location = data.find("matched=")
 						if (location != -1):
 							location = location + 8
@@ -124,21 +142,21 @@ class Video(threading.Thread):
 							break
 					matches = [match for match in new_text if x in match]
 					if matches:
-						uname = uname.join(matches)
+						self.uname = self.uname.join(matches)
 						for x in title :
-							location = uname.find(x)
+							location = self.uname.find(x)
 							if(location != -1):
 								location = location + len(x) + 1
 								break
-						uname = uname[location : len(uname)]
+						self.uname = self.uname[location : len(self.uname)]
 						if uname.find(" ") > 0:
-							uname = 'void'
+							self.uname = 'void'
 							break
 					else :
-						uname = 'void'
+						self.uname = 'void'
 
 
-		matches = [match for match in text_norm if "Lastname" in match]
+		matches = [match for match in self.text_norm if "Lastname" in match]
 		if matches:
 			lastname = lastname.join(matches)
 			location = lastname.find("Lastname")
@@ -159,8 +177,8 @@ class Video(threading.Thread):
 				lastname = lastname[location : len(lastname)]
 				if lastname.find(" "):
 					lastname == 'void'
-		elif(find_near_matches('last name',fulltext_norm, max_l_dist=1)):
-			data = ''.join(str(find_near_matches('last name',fulltext_norm, max_l_dist=1)))
+		elif(find_near_matches('last name',self.fulltext_norm, max_l_dist=1)):
+			data = ''.join(str(find_near_matches('last name',self.fulltext_norm, max_l_dist=1)))
 			location = data.find("matched=")
 			if (location != -1):
 				location = location + 9
@@ -183,43 +201,40 @@ class Video(threading.Thread):
 					lastname == 'void'
 		else:
 			lastname = 'void'
-		if uname != 'void' and lastname != 'void':
-			uname = uname + " " + lastname
-			uname_norm_found = True
+		if self.uname != 'void' and lastname != 'void':
+			self.uname = self.uname + " " + lastname
+			self.uname_norm_found = True
 		else:
 			return 'void'
-		return uname
+		return self.uname
 
 	def find_name(self):
-		global uname_thresh_found
-		global uname
-		global text
-		global fulltext
+
 		
 		new_text = []
-		uname = ''
+		self.uname = ''
 		lastname = ''
 		for x in title :
-			matches = [match for match in text if x in match]
+			matches = [match for match in self.text if x in match]
 			if matches:
-				uname = uname.join(matches)
+				self.uname = self.uname.join(matches)
 				for x in title :
 				#print(x)
-					location = uname.find(x)
+					location = self.uname.find(x)
 					if(location != -1):
 						location = location + len(x) + 1
 						#name_local = text.find("Lastname",location)
 						break
-				uname = uname[location : len(uname)]
-				if uname.find(' ') > 0:
-					uname = 'void'
+				self.uname = self.uname[location : len(self.uname)]
+				if self.uname.find(' ') > 0:
+					self.uname = 'void'
 					break
 
 			
 			else:
 				for x in title :
-					if find_near_matches(x,fulltext, max_l_dist=1) :
-						data = ''.join(str(find_near_matches(x,fulltext, max_l_dist=1)))
+					if find_near_matches(x,self.fulltext, max_l_dist=1) :
+						data = ''.join(str(find_near_matches(x,self.fulltext, max_l_dist=1)))
 						location = data.find("matched=")
 						if (location != -1):
 							location = location + 8
@@ -234,18 +249,18 @@ class Video(threading.Thread):
 							break
 					matches = [match for match in new_text if x in match]
 					if matches:
-						uname = uname.join(matches)
+						self.uname = self.uname.join(matches)
 						for x in title :
-							location = uname.find(x)
+							location = self.uname.find(x)
 							if(location != -1):
 								location = location + len(x) + 1
 								break
-						uname = uname[location : len(uname)]
-						if uname.find(" ") > 0:
-							uname = 'void'
+						self.uname = self.uname[location : len(self.uname)]
+						if self.uname.find(" ") > 0:
+							self.uname = 'void'
 							break
 					else :
-						uname = 'void'
+						self.uname = 'void'
 
 		matches = [match for match in text if "Lastname" in match]
 		if matches:
@@ -265,8 +280,8 @@ class Video(threading.Thread):
 				lastname = lastname[location : len(lastname)]
 				if lastname.find(" "):
 					lastname == 'void'
-		elif(find_near_matches('last name',fulltext, max_l_dist=1)):
-			data = ''.join(str(find_near_matches('last name',fulltext_norm, max_l_dist=1)))
+		elif(find_near_matches('last name',self.fulltext, max_l_dist=1)):
+			data = ''.join(str(find_near_matches('last name',self.fulltext_norm, max_l_dist=1)))
 			location = data.find("matched=")
 			if (location != -1):
 				location = location + 9
@@ -287,36 +302,33 @@ class Video(threading.Thread):
 				lastname = lastname[location : len(lastname)]
 		else:
 			lastname = 'void'
-		if uname != 'void' and lastname != 'void':
-			uname = uname + " " + lastname
+		if self.uname != 'void' and lastname != 'void':
+			self.uname = self.uname + " " + lastname
 			uname_thresh_found = True
-		else: uname = 'void'
+		else: self.uname = 'void'
 		#print(uname)
-		return uname
+		return self.uname
 
 	def find_date_norm(self):
-		global udate_norm_found
-		global udate
-		global text_norm
-		global fulltext_norm
+
 
 		matches = [match for match in text_norm if "Date of Birth" in match]
 		if matches:
-			udate = udate.join(matches)
+			self.udate = self.udate.join(matches)
 			i = 0
 			for x in month :
-					location = udate.find(x)
+					location = self.udate.find(x)
 					if (location != -1):
-						udate = udate.replace(x,month_num[i])
+						self.udate = self.udate.replace(x,month_num[i])
 						break
 					i = i+1
-			udate = udate.replace("Date of Birth","")
-			udate = udate.strip()
-			temp = udate.split()
-			udate = temp[2] + "-" + temp[1] + "-" + temp[0]
+			self.udate = self.udate.replace("Date of Birth","")
+			self.udate = self.udate.strip()
+			temp = self.udate.split()
+			self.udate = temp[2] + "-" + temp[1] + "-" + temp[0]
 
-		elif(find_near_matches('Date of Birth',fulltext_norm, max_l_dist=2)):
-			data = ''.join(str(find_near_matches('Date of Birth',fulltext_norm, max_l_dist=2)))
+		elif(find_near_matches('Date of Birth',self.fulltext_norm, max_l_dist=2)):
+			data = ''.join(str(find_near_matches('Date of Birth',self.fulltext_norm, max_l_dist=2)))
 			location = data.find("matched=")
 			if (location != -1):
 				location = location + 8
@@ -332,31 +344,28 @@ class Video(threading.Thread):
 			#print(new_text)
 			matches = [match for match in new_text if "Date of Birth" in match]
 			if matches:
-				udate = udate.join(matches)
+				self.udate = self.udate.join(matches)
 				i = 0
 				for x in month :
-						location = udate.find(x)
+						location = self.udate.find(x)
 						if (location != -1):
-							udate = udate.replace(x,month_num[i])
+							self.udate = self.udate.replace(x,month_num[i])
 							break
 						i = i+1
-				udate = udate.replace("Date of Birth","")
-				udate = udate.strip()
-				temp = udate.split()
-				udate = temp[2] + "-" + temp[1] + "-" + temp[0]
+				self.udate = self.udate.replace("Date of Birth","")
+				self.udate = self.udate.strip()
+				temp = self.udate.split()
+				self.udate = temp[2] + "-" + temp[1] + "-" + temp[0]
 
 				#print(udate)
-		if udate == None or udate == '':
-			udate_norm_found = False
+		if self.udate == None or self.udate == '':
+			self.udate_norm_found = False
 			return 'void'
-		udate_norm_found = True
-		return udate
+		self.udate_norm_found = True
+		return self.udate
 
 	def find_date(self):
-		global udate_thresh_found
-		global udate
-		global text
-		global fulltext
+
 		'''
 		for x in month:
 			matches = [match for match in text if "\d{2} " + x + " \d{4}" in match]
@@ -366,21 +375,21 @@ class Video(threading.Thread):
 		'''
 		matches = [match for match in text if "Date of Birth" in match]
 		if matches:
-			udate = udate.join(matches)
+			self.udate = self.udate.join(matches)
 			i = 0
 			for x in month :
-					location = udate.find(x)
+					location = self.udate.find(x)
 					if (location != -1):
-						udate = udate.replace(x,month_num[i])
+						self.udate = self.udate.replace(x,month_num[i])
 						break
 					i = i+1
-			udate = udate.replace("Date of Birth","")
-			udate = udate.strip()
-			temp = udate.split()
-			udate = temp[2] + "-" + temp[1] + "-" + temp[0]
+			self.udate = self.udate.replace("Date of Birth","")
+			self.udate = self.udate.strip()
+			temp = self.udate.split()
+			self.udate = temp[2] + "-" + temp[1] + "-" + temp[0]
 
-		elif(find_near_matches('Date of Birth',fulltext, max_l_dist=2)):
-			data = ''.join(str(find_near_matches('Date of Birth',fulltext, max_l_dist=2)))
+		elif(find_near_matches('Date of Birth',self.fulltext, max_l_dist=2)):
+			data = ''.join(str(find_near_matches('Date of Birth',self.fulltext, max_l_dist=2)))
 			location = data.find("matched=")
 			if (location != -1):
 				location = location + 8
@@ -396,92 +405,79 @@ class Video(threading.Thread):
 			#print(new_text)
 			matches = [match for match in new_text if "Date of Birth" in match]
 			if matches:
-				udate = udate.join(matches)
+				self.udate = self.udate.join(matches)
 				i = 0
 				for x in month :
-						location = udate.find(x)
+						location = self.udate.find(x)
 						if (location != -1):
-							udate = udate.replace(x,month_num[i])
+							self.udate = self.udate.replace(x,month_num[i])
 							break
 						i = i+1
-				udate = udate.replace("Date of Birth","")
-				udate = udate.strip()
+				self.udate = self.udate.replace("Date of Birth","")
+				self.udate = self.udate.strip()
 				temp = udate.split()
 				udate = temp[2] + "-" + temp[1] + "-" + temp[0]
 
 				#print(udate)
-		if udate == None or udate == '':
-			udate_thresh_found = False
+		if self.udate == None or self.udate == '':
+			self.udate_thresh_found = False
 			return 'void'
-		udate_thresh_found = True
-		return udate
+		self.udate_thresh_found = True
+		return self.udate
 
 
 	def find_id(self):
-		global uname_norm_found
-		global uname_thresh_found
-		global udate_norm_found
-		global udate_thresh_found
-		global uid
-		global fulltext
-		global fulltext_norm
 
 
-		if(uname_norm_found == True and udate_norm_found == True):
-			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext_norm)
-			uid = uid.join(id)
-			uid = uid.replace(" ","")
-		elif (uname_thresh_found == True and udate_thresh_found == True):
-			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext)
-			uid = uid.join(id)
-			uid = uid.replace(" ","")
-		elif uname_thresh_found == True:
-			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext)
-			uid = uid.join(id)
-			uid = uid.replace(" ","")
+
+		if(self.uname_norm_found == True and self.udate_norm_found == True):
+			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", self.fulltext_norm)
+			self.uid = self.uid.join(id)
+			self.uid = self.uid.replace(" ","")
+		elif (self.uname_thresh_found == True and self.udate_thresh_found == True):
+			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", self.fulltext)
+			self.uid = self.uid.join(id)
+			self.uid = self.uid.replace(" ","")
+		elif self.uname_thresh_found == True:
+			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", self.fulltext)
+			self.uid = self.uid.join(id)
+			self.uid = self.uid.replace(" ","")
 		elif uname_norm_found == True:
-			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext_norm)
-			uid = uid.join(id)
-			uid = uid.replace(" ","")
+			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", self.fulltext_norm)
+			self.uid = self.uid.join(id)
+			self.uid = self.uid.replace(" ","")
 		else :
-			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", fulltext)
-			uid = uid.join(id)
-			uid = uid.replace(" ","")
-		if uid == '' :
-			uid = 'void'
-		return uid
+			id = re.findall("\d{1} \d{4} \d{5} \d{2} \d{1}", self.fulltext)
+			self.uid = self.uid.join(id)
+			self.uid = self.uid.replace(" ","")
+		if self.uid == '' :
+			self.uid = 'void'
+		return self.uid
 
 	def search_send(self):
-		global img
-		global payload
-		global uname
-		global uid
-		global udate
-		global fulltext
-		global fulltext_norm
-		global save_frame
 
 
-		cv2.imwrite('testimage0.jpg',save_frame)
-		img = np.array(img)
-		img = cv2.imread('testimage0.jpg')
+		print("start search and send")
+		cv2.imwrite('testimage0.jpg',self.save_frame)
+		self.img = np.array(self.img)
+		self.img = cv2.imread('testimage0.jpg')
 		print("start to read image")
-		gray = get_grayscale(img)
+		self.gray = get_grayscale(self.img)
 		print("got grayscale")
-		thresh = thresholding(gray)
+		self.thresh = thresholding(self.gray)
 		print("got threshold")
-		text = pytesseract.image_to_string(thresh)
+		self.text = pytesseract.image_to_string(self.thresh)
 		print("tesseract 1")
-		text_norm = pytesseract.image_to_string(img)
+		self.text_norm = pytesseract.image_to_string(self.img)
 		print("tesseract 2")
-		text = text.splitlines()
-		text_norm = text_norm.splitlines()
+		self.text = self.text.splitlines()
+		self.text_norm = self.text_norm.splitlines()
 		#img_tha = img_tha.splitlines()
 		#print(text)
-		fulltext = ''.join(text)
-		fulltext_norm = ''.join(text_norm)
-		print(text)
-		print(text_norm)
+		self.fulltext = ''.join(self.text)
+		self.fulltext_norm = ''.join(self.text_norm)
+		print(self.text)
+		print(self.text_norm)
 		print("word splited")
 		
 		if self.find_name() == 'void':
@@ -493,16 +489,16 @@ class Video(threading.Thread):
 		else: 
 			print(self.find_date())
 		print(self.find_id())
-		if not uname:
-			uname = 'void'
-		if not uid:
-			uid = 'void'
-		if not udate:
-			udate = '0000-00-00'
-		payload = {"name" : uname , "id" : uid , "date" : udate}
-		print(uname)
-		print(uid)
-		print(udate)
+		if not self.uname:
+			self.uname = 'void'
+		if not self.uid:
+			self.uid = 'void'
+		if not self.udate:
+			self.udate = '0000-00-00'
+		self.payload = {"name" : self.uname , "id" : self.uid , "date" : self.udate}
+		print(self.uname)
+		print(self.uid)
+		print(self.udate)
 		r = requests.get('https://smartregis00.herokuapp.com/receive', params=payload)
 		if r:
 			print("send successful")
@@ -512,7 +508,7 @@ class Video(threading.Thread):
 			print(r)
 		
 
-capture = Video()
+#capture = Video()
 #thread = video()
 #thread.start()
 #print(text)

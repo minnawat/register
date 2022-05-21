@@ -52,7 +52,7 @@
     ></script>
     <!--<script type="text/javascript" {{ url_for('static', filename='capture.js')}}></script>-->
     <script>
-      function button_press(){
+      function button_scan(){
       console.log("button pressed");
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
@@ -67,8 +67,8 @@
       }
     </script>
     <script>
-      function button_press(){
-      console.log("button pressed");
+      function button_close(){
+      console.log("closing program");
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -83,6 +83,7 @@
     </script>
    <div class="container">    
     <h1 align="center">Click the button to capture the id card</h1>
-    <button type="button" class="my-button" onclick="button_press()" align="center">Click Me!</button></div>
+    <button type="button" class="my-button" onclick="button_scan()" align="center">Scan</button></div>
+    <button type="button" class="my-button" onclick="button_close()" align="center">Close</button></div>
   </body>
 </html>
