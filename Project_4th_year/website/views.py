@@ -3,17 +3,17 @@ from cvtest import Video
 
 views = Blueprint('views', __name__)
 capture = Video()
+capture.start()
 
 @views.route('/')
 def setting():
-    capture.start()
     return render_template("base.html")
 
 @views.route('/api/scan', methods=['GET'])
 def scan():
     #capture = video()
-    #capture.start()
     capture.read()
+    #capture.read()
     print("scan")
     return Response(response="success", status=200, mimetype="application/json")
 

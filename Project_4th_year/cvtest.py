@@ -41,7 +41,7 @@ class Video(threading.Thread):
 		threading.Thread.__init__(self)
 		self.running = False
 		self.reading = False
-		self.vid = VideoCapture(0)
+		self.vid = VideoCapture(1)
 		self.img = cv2.imread('testimage0.jpg')
 		self.gray = get_grayscale(img)
 		self.thresh = thresholding(gray)
@@ -78,16 +78,16 @@ class Video(threading.Thread):
       
 			# Capture the video frame
 			# by frame
-			self.ret, self.frame = self.vid.read()
-			if self.ret == True:
+			ret, frame = self.vid.read()
+			if ret == True:
 				# Display the resulting frame
-				#cv2.imshow('frame', frame)
-				
+				cv2.imshow('frame', frame)
+				cv2.waitKey(1)
 				# the 'q' button is set as the
 				# quitting button you may use any
 				# desired button of your choice
-				self.save_frame = self.frame
-				time.sleep(0.1)
+				self.save_frame = frame
+				#time.sleep(0.1)
 			if self.reading == True:
 				self.search_send()
 				self.reading = False
@@ -465,7 +465,7 @@ class Video(threading.Thread):
 		print("start search and send")
 		cv2.imwrite('testimage0.jpg',self.save_frame)
 		self.img = np.array(self.img)
-		self.img = cv2.imread('testimage1.jpg')
+		self.img = cv2.imread('testimage0.jpg')
 		print("start to read image")
 		self.gray = get_grayscale(self.img)
 		print("got grayscale")
