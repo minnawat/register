@@ -1,8 +1,12 @@
 # import the opencv library
+from attr import NOTHING
 import cv2
+from cv2 import VideoCapture
 import pytesseract
 import requests
 import re
+import threading
+import time
 from command import *
 from fuzzysearch import find_near_matches
 
@@ -26,90 +30,58 @@ uname_norm_found = False
 udate_thresh_found = False
 udate_norm_found = False
 payload = {'name': uname, 'id': uid , 'date': udate}
+save_frame = NOTHING
+event = threading.Event()
 
 
 
 
-class video():
+class Video(threading.Thread):
+	def __init__(self):
+		threading.Thread.__init__(self)
+		self.running = False
+		self.vid = VideoCapture(0)
+
 	def run(self):
+		self.running = True
 		global text
 		global text_norm
 		global fulltext
 		global fulltext_norm
+		global save_frame
 
 		print("start video")
 		# define a video capture object
 		#vid = cv2.VideoCapture("v4l2src device=/dev/video1 ! video/x-raw, format=YUY2 ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
-		vid = cv2.VideoCapture(1)
-		vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-		vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+		self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+		self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 		# define pytesseract
 		print("camera define")
 			# Capture the video frame
 			# by frame
-		while(True):
+		while(self.running):
       
 			# Capture the video frame
 			# by frame
-			ret, frame = vid.read()
+			ret, frame = self.vid.read()
 			if ret == True:
 				# Display the resulting frame
-				cv2.imshow('frame', frame)
+				#cv2.imshow('frame', frame)
 				
 				# the 'q' button is set as the
 				# quitting button you may use any
 				# desired button of your choice
-				if cv2.waitKey(1) & 0xFF == ord('q'):
-					cv2.imwrite('testimage0.jpg',frame)
-					break
+				save_frame = frame
+				time.sleep(0.1)
+	
+	def close(self):
+		self.running = False
 		# After the loop release the cap object
-		vid.release()
+		self.vid.release()
 		# Destroy all the windows
 		cv2.destroyAllWindows()
-		'''ret, frame = vid.read()
-		print("get ret and frame")
-		if ret == True:
-			# Display the resulting frame
-			#cv2.imshow('frame', frame)
-				
-			# the 'q' button is set as the
-			# quitting button you may use any
-			# desired button of your choice
-			cv2.imwrite('testimage0.jpg',frame)
-			print("got testimage0.jpg")
-		else:
-			print("error at camera not reading")
-		vid.release()
-		cv2.destroyAllWindows()
-		#code start here
-		#all varibles
-		'''
-		img = cv2.imread('testimage1.jpg')
-		print("start to read image")
-		gray = get_grayscale(img)
-		print("got grayscale")
-		thresh = thresholding(gray)
-		print("got threshold")
-		text = pytesseract.image_to_string(thresh)
-		print("tesseract 1")
-		text_norm = pytesseract.image_to_string(img)
-		print("tesseract 2")
-		text = text.splitlines()
-		text_norm = text_norm.splitlines()
-		#img_tha = img_tha.splitlines()
-		#print(text)
-		fulltext = ''.join(text)
-		fulltext_norm = ''.join(text_norm)
-		print(text)
-		print(text_norm)
-		print("word splited")
 
-
-
-
-class finder:
-
-	def find_name_norm(Self):
+	def find_name_norm(self):
 		global uname_norm_found
 		global uname
 		global text_norm
@@ -218,7 +190,7 @@ class finder:
 			return 'void'
 		return uname
 
-	def find_name(Self):
+	def find_name(self):
 		global uname_thresh_found
 		global uname
 		global text
@@ -322,7 +294,7 @@ class finder:
 		#print(uname)
 		return uname
 
-	def find_date_norm(Self):
+	def find_date_norm(self):
 		global udate_norm_found
 		global udate
 		global text_norm
@@ -380,7 +352,7 @@ class finder:
 		udate_norm_found = True
 		return udate
 
-	def find_date(Self):
+	def find_date(self):
 		global udate_thresh_found
 		global udate
 		global text
@@ -445,7 +417,7 @@ class finder:
 		return udate
 
 
-	def find_id(Self):
+	def find_id(self):
 		global uname_norm_found
 		global uname_thresh_found
 		global udate_norm_found
@@ -479,29 +451,54 @@ class finder:
 			uid = 'void'
 		return uid
 
-class search_send:
-	def run(self):
+	def search_send(self):
+		global img
 		global payload
 		global uname
 		global uid
 		global udate
+		global fulltext
+		global fulltext_norm
+		global save_frame
+
+
+		cv2.imwrite('testimage0.jpg',save_frame)
+		img = np.array(img)
+		img = cv2.imread('testimage0.jpg')
+		print("start to read image")
+		gray = get_grayscale(img)
+		print("got grayscale")
+		thresh = thresholding(gray)
+		print("got threshold")
+		text = pytesseract.image_to_string(thresh)
+		print("tesseract 1")
+		text_norm = pytesseract.image_to_string(img)
+		print("tesseract 2")
+		text = text.splitlines()
+		text_norm = text_norm.splitlines()
+		#img_tha = img_tha.splitlines()
+		#print(text)
+		fulltext = ''.join(text)
+		fulltext_norm = ''.join(text_norm)
+		print(text)
+		print(text_norm)
+		print("word splited")
 		
-		search = finder()
-		if search.find_name() == 'void':
-			print(search.find_name_norm())
+		if self.find_name() == 'void':
+			print(self.find_name_norm())
 		else: 
-			print(search.find_name())
-		if search.find_date() == 'void':
-			print(search.find_date_norm())
+			print(self.find_name())
+		if self.find_date() == 'void':
+			print(self.find_date_norm())
 		else: 
-			print(search.find_date())
-		print(search.find_id())
+			print(self.find_date())
+		print(self.find_id())
 		if not uname:
 			uname = 'void'
 		if not uid:
 			uid = 'void'
 		if not udate:
-			udate = '0000-00-00' 
+			udate = '0000-00-00'
 		payload = {"name" : uname , "id" : uid , "date" : udate}
 		print(uname)
 		print(uid)
@@ -513,7 +510,11 @@ class search_send:
 		else:
 			print("something went wrong check response code")
 			print(r)
+		
 
+capture = Video()
+#thread = video()
+#thread.start()
 #print(text)
 #cv2.imshow('',gray)
 #cv2.waitKey(0)
